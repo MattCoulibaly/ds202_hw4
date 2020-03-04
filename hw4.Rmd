@@ -1,0 +1,75 @@
+---
+title: "hw4"
+author: "Matthew Coulibaly"
+date: "3/3/2020"
+output: html_document
+---
+
+```{r}
+# Problem 1
+library(dplyr)
+d0 = filter(ChickWeight, Time == 0)
+d1 = filter(ChickWeight, Time == 0, Diet == 1)
+d2 = filter(ChickWeight, Time == 0, Diet == 2)
+d3 = filter(ChickWeight, Time == 0, Diet == 3)
+d4 = filter(ChickWeight, Time == 0, Diet == 4)
+weight0 = data.frame(Diet1 = c(mean(d1$weight), sd(d1$weight), length(d1$Chick)), Diet2 = c(mean(d2$weight), sd(d2$weight), length(d2$Chick)), Diet3 = c(mean(d3$weight), sd(d3$weight), length(d3$Chick)), Diet4 = c(mean(d4$weight), sd(d4$weight), length(d4$Chick)), row.names = c('Mean Weight', 'Standard Deviation of Weight', 'Number of Chicks'))
+weight0
+```
+
+```{r}
+# Problem 2
+s = ChickWeight %>% add_count(Chick)
+complete = filter(s, s$n == 12)
+head(complete, 3)
+```
+
+```{r}
+# Problem 3
+complete = mutate(complete, weightgain = complete$weight - 42)
+head(complete, 3)
+```
+
+```{r}
+# Problem 4
+library(ggplot2)
+day = complete[complete$Time == 21,]
+diet = reorder(day$Diet, -day$weightgain)
+ggplot(day, aes(diet, weightgain)) + 
+  geom_boxplot()
+```
+
+# Diet 3 has the highest median weightgain with the second biggest range; behind diet 2. While diet 4 has the smallest range with the second highest median. Diet 3 is riskier than diet 4 but it could pay off because the median of diet 3 is higher than the median of diet 4.
+
+
+```{r}
+# Problem 5
+# sort(ChickWeight$weight) to see the smallest and biggest values
+ChickWeight[ChickWeight$weight > 370 & ChickWeight$Time == 21, ]
+ChickWeight[ChickWeight$weight < 80 & ChickWeight$Time == 21, ]
+# Compare their weights to their beginning weights (the d0 dataframe)
+d0[d0$Chick == 24 & d0$Diet == 2,]
+d0[d0$Chick == 35 & d0$Diet == 3,]
+```
+
+# The chick that gained the most weight was chick 35 on diet 3 going from weighing 41 to 373. And the chick that gained the least weight was chick 24 on diet 2 going from weighing 42 to 74.
+
+```{r}
+# Problem 6
+library(ggplot2)
+df = ChickWeight[ChickWeight$Chick %in% d0[d0$weight == 43,]$Chick | ChickWeight$Chick %in% d0[d0$weight == 39,]$Chick,]
+ggplot(df, aes(Time, weight, fill = Chick)) +
+  geom_point() +
+  geom_line()
+```
+
+```{r}
+# Problem 8
+table(ChickWeight$Diet)
+day = complete[complete$Time == 21,]
+diet = reorder(day$Diet, -day$weight)
+ggplot(day, aes(diet, weight)) + 
+  geom_boxplot()
+```
+
+# One thing that I find intresting is that there were 220 chicks on diet one while all the other diets had 120 or 118 chicks in their diet. This adds another level in variability when comparing to diet 1 because there are more chicks in that diet than others. Another thing I found interesting is the variability in the 'best' weight gaining diet; diet 3. Though the median is higher in diet 3 than 4, the range of diet 3 is much wider than diet 4. The chances of getting a final weight of less than 200 are greater in diet 3 than 4. But the chances of getting a final weight of over 350 is also greater than in diet 4. Though the mediean of diet 3 is higher, it is much riskier to bet on it than diet 3 than diet 4.
